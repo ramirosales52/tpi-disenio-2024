@@ -1,11 +1,15 @@
-import Resenia from '../models/Resenia'
 import Vino from '../models/Vino'
 
 import { vinos } from '../data/data'
+import { exportVinosToExcel } from '../utils/exceljs'
+import { exportVinosToPDF } from '../utils/pdfkit'
 
 type VinosConDatosYPromedio = {
-  name: string
-  promedio: number
+  puntaje: number
+  vino: string
+  bodega: string
+  varietales: string[]
+  precio: number
 }
 
 export default class GestorRankingVinos {
@@ -14,16 +18,8 @@ export default class GestorRankingVinos {
   private tipoVisualizacion?: string
   private vinosConResenias: Array<Vino> = []
   private vinosConPuntaje: Map<Vino, number>[] = []
-  // private reseniasDeSommeliersEnPeriodo: Array<Resenia> = []
 
-  private reseniasDeSommeliers: Array<Resenia> = []
-  // private sommeliers: Array<Sommelier> = []
-  // string -> nombre vino
-  // number -> puntaje
-
-  constructor() {
-    // Inicializamos el array de TODOS LOS VINOS en el gestor
-  }
+  constructor() {}
 
   public generarRankingVinos(): void {
     // Filtrar vinos que tengan al menos una reseña
@@ -39,16 +35,19 @@ export default class GestorRankingVinos {
           this.fechaDesde,
           this.fechaHasta
         )
-      // console.log({ reseniasDeSommeliersEnPeriodo })
 
+      // Calculamos el puntaje promedio de las reseñas
       const puntaje = vino.calcularPromedioReseñasValidadas(
         reseniasDeSommeliersEnPeriodo
       )
+
+      // Creamos un nuevo map para el vino con el puntaje promedio
       const map = new Map<Vino, number>()
       map.set(vino, puntaje)
       this.vinosConPuntaje.push(map)
     })
 
+    // Ordenamos los vinos y tomamos los primeros 10
     this.ordenarVinosSegunCalifiacion()
     this.obtenerTopTenVinosConInformacion()
   }
@@ -65,12 +64,37 @@ export default class GestorRankingVinos {
     // Tomamos los primeros 10 vinos de la lista ordenada
     const top10VinosConPuntaje = this.vinosConPuntaje.slice(0, 10)
 
-    top10VinosConPuntaje.forEach(vinoConPuntaje => {
+    const datosVinoConPuntaje = top10VinosConPuntaje.map(vinoConPuntaje => {
       const vino: Vino = vinoConPuntaje.keys().next().value
       const puntaje = vinoConPuntaje.values().next().value
+
+      // Obtenemos la información del vino y le agregamos el puntaje promedio
       const datosVino = vino.obtenerInformacionVinoBodegaVarietal()
-      console.log(`${datosVino}Puntaje: ${puntaje}\n`)
+      const datosVinoConPuntaje: VinosConDatosYPromedio = {
+        ...datosVino,
+        puntaje,
+      }
+
+      return datosVinoConPuntaje
     })
+
+    // Creamos el PDF o el Excel dependiendo del pedido del usuario
+    if (this.tipoVisualizacion === 'excel') {
+      this.generarExcel(datosVinoConPuntaje)
+    }
+    if (this.tipoVisualizacion === 'pdf') {
+      this.generarPDF(datosVinoConPuntaje)
+    }
+
+    //TODO: Notificar
+  }
+
+  public async generarExcel(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
+    await exportVinosToExcel(datosVinoConPuntaje)
+  }
+
+  public async generarPDF(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
+    await exportVinosToPDF(datosVinoConPuntaje)
   }
 
   public opcionGenerarRankingVinos(): void {
@@ -91,7 +115,6 @@ export default class GestorRankingVinos {
   }
 
   public tomarTipoVisualizacion(tipoVisualizacion: string) {
-    // TENGO EL TIPO DE RESEÑA SELECCIONADO POR EL USUARIO
     this.tipoVisualizacion = tipoVisualizacion
   }
 

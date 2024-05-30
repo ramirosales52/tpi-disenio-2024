@@ -48,10 +48,15 @@ export default class Vino {
     )
   }
 
-  obtenerInformacionVinoBodegaVarietal(): string {
-    return `Vino: ${this.getNombre()}\nBodega: ${this.getBodega().obtenerNombreRegionProvinciaYPais()}\n\nVarietales:\n${this.getVarietales()
-      .map(varietal => `${varietal.obtenerNombreYTipoUva()}`)
-      .join('')}\nPrecio: ${this.getPrecio()}\n`
+  obtenerInformacionVinoBodegaVarietal() {
+    return {
+      vino: this.getNombre(),
+      bodega: this.getBodega().obtenerNombreRegionProvinciaYPais(),
+      varietales: this.getVarietales().map(varietal =>
+        varietal.obtenerNombreYTipoUva()
+      ),
+      precio: this.getPrecio(),
+    }
   }
 
   getNombre(): string {

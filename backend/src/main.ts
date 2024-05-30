@@ -12,10 +12,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Render en la ruta / de lo que está en la carpeta public
-app.use(express.static(path.join(__dirname, '../../frontend/dist')))
-
-const gestor = new GestorRankingVinos()
+// Render ante un GET en la ruta /
+// app.use(express.static(path.join(__dirname, '../../frontend/dist')))
 
 // app.post('/confirmar', (req: Request, res: Response) => {
 //   const { body } = req
@@ -24,9 +22,10 @@ const gestor = new GestorRankingVinos()
 // })
 
 app.post('/generar-ranking', (req: Request, res: Response) => {
+  const gestor = new GestorRankingVinos()
   const { body } = req
   const { fechaDesde, fechaHasta, tipoVisualizacion } = body
-
+  console.log(tipoVisualizacion)
   gestor.tomarFechasIngresadas(new Date(fechaDesde), new Date(fechaHasta))
   gestor.tomarTipoVisualizacion(tipoVisualizacion)
   gestor.generarRankingVinos()
