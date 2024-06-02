@@ -21,15 +21,27 @@ app.use(express.json())
 //   gestor.generarRankingVinos()
 // })
 
-app.post('/generar-ranking', (req: Request, res: Response) => {
+app.post('/generar-ranking', async (req: Request, res: Response) => {
   const gestor = new GestorRankingVinos()
   const { body } = req
   const { fechaDesde, fechaHasta, tipoVisualizacion } = body
-  gestor.tomarFechasIngresadas(new Date(fechaDesde), new Date(fechaHasta))
   gestor.tomarTipoVisualizacion(tipoVisualizacion)
-  gestor.generarRankingVinos()
+  const { error } = gestor.tomarFechasIngresadas(
+    new Date(fechaDesde),
+    new Date(fechaHasta)
+  )
 
-  res.status(200).json({ success: true })
+  if (error) {
+    return res.status(400).json({ success: false, message: 'Fechas inválidas' })
+  }
+
+  const { success, message } = await gestor.generarRankingVinos()
+
+  if (success) {
+    return res.status(201).json({ success, message })
+  } else {
+    return res.status(400).json({ success, message })
+  }
 })
 
 // Iniciamos el servidor

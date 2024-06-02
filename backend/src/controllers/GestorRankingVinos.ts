@@ -14,7 +14,10 @@ export default class GestorRankingVinos {
 
   constructor() {}
 
-  public generarRankingVinos(): void {
+  public async generarRankingVinos(): Promise<{
+    success: boolean
+    message: string
+  }> {
     // Filtrar vinos que tengan al menos una reseña
     this.vinosConResenias = vinos.filter(vino => {
       return vino.tieneResenias()
@@ -44,7 +47,8 @@ export default class GestorRankingVinos {
 
     // Ordenamos los vinos y tomamos los primeros 10
     this.ordenarVinosSegunCalifiacion()
-    this.obtenerTopTenVinosConInformacion()
+    const { success, message } = await this.obtenerTopTenVinosConInformacion()
+    return { success, message }
   }
 
   public ordenarVinosSegunCalifiacion() {
@@ -55,7 +59,7 @@ export default class GestorRankingVinos {
     })
   }
 
-  public obtenerTopTenVinosConInformacion() {
+  public async obtenerTopTenVinosConInformacion() {
     // Tomamos los primeros 10 vinos de la lista ordenada
     const top10VinosConPuntaje = this.vinosConPuntaje.slice(0, 10)
 
@@ -74,25 +78,20 @@ export default class GestorRankingVinos {
     })
 
     if (datosVinoConPuntaje.length === 0) {
-      this.notificarNoHayVinosConPuntaje()
-      return
+      return { success: false, message: 'No hay vinos con reseñas validas' }
     }
 
     // Creamos el PDF o el Excel dependiendo del pedido del usuario
     if (this.tipoVisualizacion === 'excel') {
-      this.generarExcel(datosVinoConPuntaje)
-      console.log('Excel generado correctamente')
+      await this.generarExcel(datosVinoConPuntaje)
+      return { success: true, message: 'Excel generado correctamente' }
     }
     if (this.tipoVisualizacion === 'pdf') {
-      this.generarPDF(datosVinoConPuntaje)
-      console.log('PDF generado correctamente')
+      await this.generarPDF(datosVinoConPuntaje)
+      return { success: true, message: 'PDF generado correctamente' }
     }
 
-    //TODO: Notificar
-  }
-
-  public notificarNoHayVinosConPuntaje() {
-    console.log('No hay vinos con puntaje')
+    return { success: false, message: 'No se pudo generar' }
   }
 
   public async generarExcel(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
@@ -109,14 +108,14 @@ export default class GestorRankingVinos {
   }
 
   public tomarFechasIngresadas(fechaDesde: Date, fechaHasta: Date) {
-    try {
-      this.validarFechasIngresadas(fechaDesde, fechaHasta)
-      this.fechaDesde = fechaDesde
-      this.fechaHasta = fechaHasta
-    } catch (error) {
-      console.log(error)
-    }
+    const { error } = this.validarFechasIngresadas(fechaDesde, fechaHasta)
 
+    if (error) return { error }
+
+    this.fechaDesde = fechaDesde
+    this.fechaHasta = fechaHasta
+
+    return { error: false }
     // pantalla.solicitarTipoReseña()
   }
 
@@ -136,11 +135,12 @@ export default class GestorRankingVinos {
   public validarFechasIngresadas(fechaDesde: Date, fechaHasta: Date) {
     // Validar que la fecha Desde sea menor o igual a la fecha Hasta
     if (fechaDesde > fechaHasta) {
-      throw new Error('La fecha Desde debe ser menor o igual a la fecha Hasta.')
+      return {
+        error: true,
+      }
     }
-    const fechaActual = new Date()
-    if (fechaHasta > fechaActual) {
-      throw new Error('La fecha Hasta no puede ser mayor a la fecha actual.')
+    return {
+      error: false,
     }
   }
 
