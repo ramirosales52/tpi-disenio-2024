@@ -46,12 +46,12 @@ export default class GestorRankingVinos {
     })
 
     // Ordenamos los vinos y tomamos los primeros 10
-    this.ordenarVinosSegunCalifiacion()
+    this.ordenarVinosSegunCalificacion()
     const { success, message } = await this.obtenerTopTenVinosConInformacion()
     return { success, message }
   }
 
-  public ordenarVinosSegunCalifiacion() {
+  public ordenarVinosSegunCalificacion() {
     this.vinosConPuntaje.sort((a, b) => {
       const puntajeA = a.values().next().value
       const puntajeB = b.values().next().value
