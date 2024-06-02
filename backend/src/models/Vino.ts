@@ -39,7 +39,7 @@ export default class Vino {
     )
   }
 
-  calcularPromedioReseñasValidadas(resenias: Resenia[]): number {
+  calcularPromedioReseniasValidadas(resenias: Resenia[]): number {
     return (
       resenias.reduce(
         (acumulador, resenia) => acumulador + resenia.obtenerPuntaje(),

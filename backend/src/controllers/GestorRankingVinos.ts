@@ -35,7 +35,7 @@ export default class GestorRankingVinos {
       if (reseniasDeSommeliersEnPeriodo.length === 0) return
 
       // Calculamos el puntaje promedio de las reseñas
-      const puntaje = vino.calcularPromedioReseñasValidadas(
+      const puntaje = vino.calcularPromedioReseniasValidadas(
         reseniasDeSommeliersEnPeriodo
       )
 
@@ -77,8 +77,9 @@ export default class GestorRankingVinos {
       return datosVinoConPuntaje
     })
 
-    if (datosVinoConPuntaje.length === 0) {
-      return { success: false, message: 'No hay vinos con reseñas válidas' }
+    // Validamos si hay vinos con reseñas validas
+    if (this.validarSiHayReseniasValidas(datosVinoConPuntaje)) {
+      return { success: false, message: 'No hay vinos con reseñas validas' }
     }
 
     // Creamos el PDF o el Excel dependiendo del pedido del usuario
@@ -92,6 +93,12 @@ export default class GestorRankingVinos {
     }
 
     return { success: false, message: 'No se pudo generar' }
+  }
+
+  public validarSiHayReseniasValidas(
+    datosVinoConPuntaje: VinosConDatosYPromedio[]
+  ) {
+    return datosVinoConPuntaje.length === 0
   }
 
   public async generarExcel(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
@@ -144,9 +151,9 @@ export default class GestorRankingVinos {
     }
   }
 
-  public solicitarReseña() {}
+  // public solicitarReseña() {}
 
-  public solicitarFormaVisualizacion() {}
+  // public solicitarFormaVisualizacion() {}
 
-  public solicitarConfirmacion() {}
+  // public solicitarConfirmacion() {}
 }

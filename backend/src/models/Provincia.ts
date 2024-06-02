@@ -1,8 +1,8 @@
 import Pais from './Pais'
 
 export default class Provincia {
-  private nombre
-  private pais
+  private nombre: string
+  private pais: Pais
   constructor(nombre: string, pais: Pais) {
     this.nombre = nombre
     this.pais = pais
