@@ -13,7 +13,7 @@ app.use(cors())
 app.use(express.json())
 
 // Sirve archivos estáticos
-app.use(express.static(path.join(__dirname, './output')))
+app.use('/static', express.static(path.join(__dirname, './output')))
 
 // app.post('/confirmar', (req: Request, res: Response) => {
 //   const { body } = req
