@@ -1,8 +1,8 @@
-import path from 'node:path'
-// paquete para crear el servidor
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+
+import path from 'node:path'
 
 import GestorRankingVinos from './controllers/GestorRankingVinos'
 
@@ -12,8 +12,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Render ante un GET en la ruta /
-// app.use(express.static(path.join(__dirname, '../../frontend/dist')))
+// Sirve archivos estáticos
+app.use(express.static(path.join(__dirname, './output')))
 
 // app.post('/confirmar', (req: Request, res: Response) => {
 //   const { body } = req
