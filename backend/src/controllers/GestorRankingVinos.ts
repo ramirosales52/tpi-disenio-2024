@@ -29,6 +29,8 @@ export default class GestorRankingVinos {
           this.fechaHasta
         )
 
+      if (reseniasDeSommeliersEnPeriodo.length === 0) return
+
       // Calculamos el puntaje promedio de las reseñas
       const puntaje = vino.calcularPromedioReseñasValidadas(
         reseniasDeSommeliersEnPeriodo
