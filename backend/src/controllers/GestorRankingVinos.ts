@@ -78,11 +78,11 @@ export default class GestorRankingVinos {
     })
 
     if (datosVinoConPuntaje.length === 0) {
-      return { success: false, message: 'No hay vinos con reseñas validas' }
+      return { success: false, message: 'No hay vinos con reseñas válidas' }
     }
 
     // Creamos el PDF o el Excel dependiendo del pedido del usuario
-    if (this.tipoVisualizacion === 'excel') {
+    if (this.tipoVisualizacion === 'xlsx') {
       await this.generarExcel(datosVinoConPuntaje)
       return { success: true, message: 'Excel generado correctamente' }
     }

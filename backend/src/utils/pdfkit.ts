@@ -4,7 +4,6 @@ import path from 'node:path'
 
 import { type VinosConDatosYPromedio } from '../types'
 
-
 export const exportVinosToPDF = async (
   datosVinos: VinosConDatosYPromedio[]
 ) => {

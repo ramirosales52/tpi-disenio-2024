@@ -21,6 +21,8 @@ app.use(express.json())
 //   gestor.generarRankingVinos()
 // })
 
+app.use('/static', express.static(path.join(__dirname, './output')))
+
 app.post('/generar-ranking', async (req: Request, res: Response) => {
   const gestor = new GestorRankingVinos()
   const { body } = req
