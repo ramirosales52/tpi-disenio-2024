@@ -3,14 +3,7 @@ import Vino from '../models/Vino'
 import { vinos } from '../data/data'
 import { exportVinosToExcel } from '../utils/exceljs'
 import { exportVinosToPDF } from '../utils/pdfkit'
-
-type VinosConDatosYPromedio = {
-  puntaje: number
-  vino: string
-  bodega: string
-  varietales: string[]
-  precio: number
-}
+import { type VinosConDatosYPromedio } from '../types'
 
 export default class GestorRankingVinos {
   private fechaDesde: Date = new Date()
@@ -78,15 +71,26 @@ export default class GestorRankingVinos {
       return datosVinoConPuntaje
     })
 
+    if (datosVinoConPuntaje.length === 0) {
+      this.notificarNoHayVinosConPuntaje()
+      return
+    }
+
     // Creamos el PDF o el Excel dependiendo del pedido del usuario
     if (this.tipoVisualizacion === 'excel') {
       this.generarExcel(datosVinoConPuntaje)
+      console.log('Excel generado correctamente')
     }
     if (this.tipoVisualizacion === 'pdf') {
       this.generarPDF(datosVinoConPuntaje)
+      console.log('PDF generado correctamente')
     }
 
     //TODO: Notificar
+  }
+
+  public notificarNoHayVinosConPuntaje() {
+    console.log('No hay vinos con puntaje')
   }
 
   public async generarExcel(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
@@ -143,6 +147,4 @@ export default class GestorRankingVinos {
   public solicitarFormaVisualizacion() {}
 
   public solicitarConfirmacion() {}
-
-  public calcularPromedioReseniaVino() {}
 }

@@ -37,6 +37,79 @@ const resenia9 = new Resenia(true, new Date('2021-06-15'), 67)
 const resenia10 = new Resenia(true, new Date('2021-06-15'), 20)
 const resenia11 = new Resenia(true, new Date('2021-06-15'), 59)
 
+// export const vinosSinResenias: Vino[] = [
+//   new Vino(
+//     'Vino 1',
+//     20,
+//     [varietal1],
+//     bodega1
+//     // [resenia1, resenia2]
+//   ), // 95 30
+//   new Vino(
+//     'Vino 2',
+//     25,
+//     [varietal1],
+//     bodega1
+//     // [resenia2, resenia3]
+//   ), // 45 45
+//   new Vino(
+//     'Vino 3',
+//     30,
+//     [varietal1],
+//     bodega1
+//     // [resenia3, resenia4]
+//   ), // 45 52
+//   new Vino(
+//     'Vino 4',
+//     35,
+//     [varietal1],
+//     bodega1
+//     // [resenia4, resenia5]
+//   ), // 52 100
+//   new Vino(
+//     'Vino 5',
+//     40,
+//     [varietal1],
+//     bodega1
+//     // [resenia5, resenia6]
+//   ), // 100 49
+//   new Vino(
+//     'Vino 6',
+//     45,
+//     [varietal1, varietal2],
+//     bodega1
+//     // [resenia6, resenia7]
+//   ), // 49 91
+//   new Vino(
+//     'Vino 7',
+//     50,
+//     [varietal1],
+//     bodega1
+//     // [resenia7, resenia8]
+//   ), // 91 85
+//   new Vino(
+//     'Vino 8',
+//     55,
+//     [varietal1],
+//     bodega1
+//     // [resenia8, resenia9]
+//   ), // 85 67
+//   new Vino(
+//     'Vino 9',
+//     60,
+//     [varietal1],
+//     bodega1
+//     // [resenia9, resenia10]
+//   ), // 67 20
+//   new Vino(
+//     'Vino 10',
+//     65,
+//     [varietal1],
+//     bodega1
+//     // [resenia10, resenia11]
+//   ), // 20 59
+// ]
+
 export const vinos: Vino[] = [
   new Vino('Vino 1', 20, [varietal1], bodega1, [resenia1, resenia2]), // 95 30
   new Vino('Vino 2', 25, [varietal1], bodega1, [resenia2, resenia3]), // 45 45

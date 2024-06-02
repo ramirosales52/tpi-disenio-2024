@@ -2,13 +2,8 @@ import PDFDocument from 'pdfkit'
 import fs from 'node:fs'
 import path from 'node:path'
 
-type VinosConDatosYPromedio = {
-  puntaje: number
-  vino: string
-  bodega: string
-  varietales: string[]
-  precio: number
-}
+import { type VinosConDatosYPromedio } from '../types'
+
 
 export const exportVinosToPDF = async (
   datosVinos: VinosConDatosYPromedio[]

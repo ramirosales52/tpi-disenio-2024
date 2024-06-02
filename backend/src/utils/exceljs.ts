@@ -1,13 +1,7 @@
 import Excel from 'exceljs'
 import path from 'node:path'
 
-type VinosConDatosYPromedio = {
-  puntaje: number
-  vino: string
-  bodega: string
-  varietales: string[]
-  precio: number
-}
+import { type VinosConDatosYPromedio } from '../types'
 
 export const exportVinosToExcel = async (
   datosVinos: VinosConDatosYPromedio[]
@@ -16,7 +10,12 @@ export const exportVinosToExcel = async (
   const worksheet = workbook.addWorksheet('Lista de Vinos')
 
   worksheet.columns = [
-    { header: 'Puntaje', key: 'puntaje', width: 10 },
+    {
+      header: 'Puntaje',
+      key: 'puntaje',
+      width: 10,
+      font: { bold: true, size: 16 },
+    },
     { header: 'Vino', key: 'vino', width: 10 },
     { header: 'Bodega', key: 'bodega', width: 10 },
     { header: 'Varietales', key: 'varietales', width: 10 },

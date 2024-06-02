@@ -25,7 +25,6 @@ app.post('/generar-ranking', (req: Request, res: Response) => {
   const gestor = new GestorRankingVinos()
   const { body } = req
   const { fechaDesde, fechaHasta, tipoVisualizacion } = body
-  console.log(tipoVisualizacion)
   gestor.tomarFechasIngresadas(new Date(fechaDesde), new Date(fechaHasta))
   gestor.tomarTipoVisualizacion(tipoVisualizacion)
   gestor.generarRankingVinos()
