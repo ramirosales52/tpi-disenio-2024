@@ -9,9 +9,7 @@ export default class Bodega {
   }
 
   obtenerNombreRegionProvinciaYPais(): string {
-    return (
-      this.getNombre() + ', ' + this.getRegion().obtenerNombreProvinciaYPais()
-    )
+    return this.nombre + ', ' + this.region.obtenerNombreProvinciaYPais()
   }
 
   getNombre(): string {

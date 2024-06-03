@@ -51,8 +51,8 @@ export default class Vino {
   obtenerInformacionVinoBodegaVarietal() {
     return {
       vino: this.getNombre(),
-      bodega: this.getBodega().obtenerNombreRegionProvinciaYPais(),
-      varietales: this.getVarietales().map(varietal =>
+      bodega: this.bodega.obtenerNombreRegionProvinciaYPais(),
+      varietales: this.varietales.map(varietal =>
         varietal.obtenerNombreYTipoUva()
       ),
       precio: this.getPrecio(),

@@ -12,7 +12,7 @@ export default class Varietal {
   }
 
   obtenerNombreYTipoUva(): string {
-    return `${this.getNombre()} - Tipo Uva: ${this.getTipoUva().getNombre()}`
+    return `${this.nombre} - Tipo Uva: ${this.tipoUva.getTipoUva()}`
   }
 
   getNombre(): string {

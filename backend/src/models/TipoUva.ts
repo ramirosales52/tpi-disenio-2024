@@ -8,6 +8,10 @@ export default class TipoUva {
     return this.nombre
   }
 
+  getTipoUva(): string {
+    return this.getNombre()
+  }
+
   setNombre(nombre: string) {
     this.nombre = nombre
   }

@@ -9,7 +9,7 @@ export default class RegionVitivinicola {
   }
 
   obtenerNombreProvinciaYPais(): string {
-    return this.getNombre() + ', ' + this.getProvincia().obtenerNombreYPais()
+    return this.nombre + ', ' + this.provincia.obtenerNombreYPais()
   }
 
   getNombre(): string {

@@ -9,7 +9,7 @@ export default class Provincia {
   }
 
   obtenerNombreYPais(): string {
-    return this.getNombre() + ', ' + this.getPais().obtenerNombre()
+    return this.nombre + ', ' + this.pais.obtenerNombre()
   }
 
   getNombre(): string {
