@@ -123,7 +123,6 @@ export default class GestorRankingVinos {
     this.fechaHasta = fechaHasta
 
     return { error: false }
-    // pantalla.solicitarTipoReseña()
   }
 
   public tomarTipoVisualizacion(tipoVisualizacion: string) {
@@ -135,7 +134,6 @@ export default class GestorRankingVinos {
   }
 
   public tomarConfirmacion() {
-    // TENGO LA CONFIRMACION DEL USUARIO
     this.generarRankingVinos()
   }
 
@@ -150,10 +148,4 @@ export default class GestorRankingVinos {
       error: false,
     }
   }
-
-  // public solicitarReseña() {}
-
-  // public solicitarFormaVisualizacion() {}
-
-  // public solicitarConfirmacion() {}
 }
