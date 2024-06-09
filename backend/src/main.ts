@@ -15,14 +15,6 @@ app.use(express.json())
 // Sirve archivos estáticos
 app.use('/static', express.static(path.join(__dirname, './output')))
 
-// app.post('/confirmar', (req: Request, res: Response) => {
-//   const { body } = req
-
-//   gestor.generarRankingVinos()
-// })
-
-app.use('/static', express.static(path.join(__dirname, './output')))
-
 app.post('/generar-ranking', async (req: Request, res: Response) => {
   const gestor = new GestorRankingVinos()
   const { body } = req
