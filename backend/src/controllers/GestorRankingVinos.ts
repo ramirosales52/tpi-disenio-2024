@@ -133,8 +133,12 @@ export default class GestorRankingVinos {
     // pantalla.solicitarTipoVisualizacion()
   }
 
-  public tomarConfirmacion() {
-    this.generarRankingVinos()
+  public async tomarConfirmacion() {
+    return await this.generarRankingVinos()
+  }
+
+  public tomarTipoResenia(tipoResenia: string) {
+    // console.log(tipoResenia)
   }
 
   public validarFechasIngresadas(fechaDesde: Date, fechaHasta: Date) {

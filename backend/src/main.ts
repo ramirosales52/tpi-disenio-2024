@@ -18,8 +18,13 @@ app.use('/static', express.static(path.join(__dirname, './output')))
 app.post('/generar-ranking', async (req: Request, res: Response) => {
   const gestor = new GestorRankingVinos()
   const { body } = req
-  const { fechaDesde, fechaHasta, tipoVisualizacion } = body
-  gestor.tomarTipoVisualizacion(tipoVisualizacion)
+  const {
+    fechaDesde,
+    fechaHasta,
+    tipoVisualizacion,
+    tipoResenia = 'sommelier',
+  } = body
+
   const { error } = gestor.tomarFechasIngresadas(
     new Date(fechaDesde),
     new Date(fechaHasta)
@@ -29,7 +34,10 @@ app.post('/generar-ranking', async (req: Request, res: Response) => {
     return res.status(400).json({ success: false, message: 'Fechas inválidas' })
   }
 
-  const { success, message } = await gestor.generarRankingVinos()
+  gestor.tomarTipoResenia(tipoResenia)
+  gestor.tomarTipoVisualizacion(tipoVisualizacion)
+
+  const { success, message } = await gestor.tomarConfirmacion()
 
   if (success) {
     return res.status(201).json({ success, message })
