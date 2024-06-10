@@ -3,12 +3,12 @@
 import { Button, DatePicker, Form, Select, Space } from 'antd';
 import type { FormProps } from 'antd';
 import axios from 'axios';
-import Link from 'next/link';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+// Interfaz de los datos necesarios
 type FieldType = {
   fechaDesde?: string;
   fechaHasta?: string;
@@ -16,21 +16,24 @@ type FieldType = {
   tipoVisualizacion?: string;
 };
 
-
 export default function GenerarRankingVinos() {
-
+  // DEclaramos las variables necesarias
   const [tipoVisualizacion, setVisualizacion] = useState<string>('')
   const [visible, setVisible] = useState<boolean>(true)
   
+  // Enviamos un POST al backend con los datos necesarios
   const generarRankingVinos: FormProps<FieldType>['onFinish'] = async (fieldsValue: any) => {
+    // Formateamos los datos
     const values = {
       ...fieldsValue,
       'fechaDesde': fieldsValue['fechaDesde'].format('YYYY-MM-DD'),
       'fechaHasta': fieldsValue['fechaHasta'].format('YYYY-MM-DD'),
     }
     console.log(values)
+
     await axios.post('http://localhost:4000/generar-ranking', values)
-      .then(response => {
+    // Si la respuesta es exitosa (cod. 200) lanzamos un mensaje exitoso por pantalla
+    .then(response => {
         Swal.fire({
           position: 'center',
           icon: 'success',
@@ -41,6 +44,7 @@ export default function GenerarRankingVinos() {
         console.log(response.data)
         setVisible(false)
       })
+      // Si hubo un error en la respuesta (cod. 400) lanzamos un mensaje de error por pantalla
       .catch(error => {
         Swal.fire({
           position: 'center',
