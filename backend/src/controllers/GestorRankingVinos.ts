@@ -1,43 +1,68 @@
 import Vino from '../models/Vino'
 
-import { vinos } from '../data/data'
+import { vinos, paisesDB, provinciasDB } from '../data/data'
 import { exportVinosToExcel } from '../utils/exceljs'
 import { exportVinosToPDF } from '../utils/pdfkit'
 import { type VinosConDatosYPromedio } from '../types'
+import Provincia from '../models/Provincia'
+import Pais from '../models/Pais'
+import { SommelierStrategy } from '../models/strategy/SommelierStrategy'
+import { TipoReseniaStrategy } from '../models/strategy/TipoReseniaStrategy'
+import { AmigoStrategy } from '../models/strategy/AmigoStrategy'
+import { NormalStrategy } from '../models/strategy/NormalStrategy'
 
 export default class GestorRankingVinos {
   private fechaDesde: Date = new Date()
   private fechaHasta: Date = new Date()
+  private tipoResenia: string = ''
+  private strategy: TipoReseniaStrategy | undefined
   private tipoVisualizacion?: string
   private vinosConResenias: Array<Vino> = []
   private vinosConPuntaje: Map<Vino, number>[] = []
+  private provincias: Provincia[] = []
+  private paises: Pais[] = []
 
-  constructor() {}
+  constructor() {
+    this.provincias = provinciasDB
+    this.paises = paisesDB
+  }
 
   public async generarRankingVinos(): Promise<{
     success: boolean
     message: string
   }> {
+    if (this.tipoResenia === 'sommelier') {
+      this.strategy = new SommelierStrategy()
+    }
+    if (this.tipoResenia === 'amigo') {
+      this.strategy = new AmigoStrategy()
+    }
+    if (this.tipoResenia === 'normal') {
+      this.strategy = new NormalStrategy()
+    }
+
     // Filtrar vinos que tengan al menos una reseña
     this.vinosConResenias = vinos.filter(vino => {
-      return vino.tieneResenias()
-    })
+      if (!vino.tieneResenias()) {
+        return
+      }
 
-    // Recorremos cada vino que tenga reseñas
-    this.vinosConResenias.forEach(vino => {
-      // Obtenemos las reseñas de los sommeliers dentro del periodo para cada vino
-      const reseniasDeSommeliersEnPeriodo =
-        vino.mostrarReseñasDeSommelierEnPeriodo(
-          this.fechaDesde,
-          this.fechaHasta
-        )
+      if (!this.strategy) {
+        throw new Error('Estrategia no definida')
+      }
 
-      if (reseniasDeSommeliersEnPeriodo.length === 0) return
+      // IMPLEMENTAMOS EL PATRÓN STRATEGY
+      const reseniasEnPeriodo = vino.filtrarResenias(
+        this.strategy,
+        this.fechaDesde,
+        this.fechaHasta
+      )
+
+      if (reseniasEnPeriodo.length === 0) return
 
       // Calculamos el puntaje promedio de las reseñas
-      const puntaje = vino.calcularPromedioReseniasValidadas(
-        reseniasDeSommeliersEnPeriodo
-      )
+      // Lo hacemos en el vino para no repetir código por cada estrategia
+      const puntaje = vino.calcularPromedioReseniasValidadas(reseniasEnPeriodo)
 
       // Creamos un nuevo map para el vino con el puntaje promedio
       const map = new Map<Vino, number>()
@@ -53,8 +78,8 @@ export default class GestorRankingVinos {
 
   public ordenarVinosSegunCalificacion() {
     this.vinosConPuntaje.sort((a, b) => {
-      const puntajeA = a.values().next().value
-      const puntajeB = b.values().next().value
+      const puntajeA = a.values().next().value || 0
+      const puntajeB = b.values().next().value || 0
       return puntajeB - puntajeA
     })
   }
@@ -64,21 +89,44 @@ export default class GestorRankingVinos {
     const top10VinosConPuntaje = this.vinosConPuntaje.slice(0, 10)
 
     const datosVinoConPuntaje = top10VinosConPuntaje.map(vinoConPuntaje => {
-      const vino: Vino = vinoConPuntaje.keys().next().value
+      const vino = vinoConPuntaje.keys().next().value
+      if (!vino) {
+        throw new Error('Vino no encontrado')
+      }
+
       const puntaje = vinoConPuntaje.values().next().value
 
       // Obtenemos la información del vino y le agregamos el puntaje promedio
-      const datosVino = vino.obtenerInformacionVinoBodegaVarietal()
+      const datosVino = vino.obtenerInformacionVinoBodegaRegionYVarietal()
+
       const datosVinoConPuntaje: VinosConDatosYPromedio = {
         ...datosVino,
-        puntaje,
+        puntaje: puntaje || 0,
       }
+
+      // Buscamos entre todas las provincias la que contienen la región del vino
+      const provinciaEncontrada = this.provincias.find(provincia =>
+        provincia.esTuRegion(datosVinoConPuntaje.region)
+      )
+      if (!provinciaEncontrada) {
+        throw new Error('Provincia no encontrada')
+      }
+      datosVinoConPuntaje.provincia = provinciaEncontrada
+
+      // Buscar país que contenga la provincia
+      const paisEncontrado = this.paises.find(pais =>
+        pais.esTuProvincia(provinciaEncontrada)
+      )
+      if (!paisEncontrado) {
+        throw new Error('País no encontrado')
+      }
+      datosVinoConPuntaje.pais = paisEncontrado
 
       return datosVinoConPuntaje
     })
 
     // Validamos si hay vinos con reseñas validas
-    if (this.validarSiHayReseniasValidas(datosVinoConPuntaje)) {
+    if (!this.validarSiHayReseniasValidas(datosVinoConPuntaje)) {
       return { success: false, message: 'No hay vinos con reseñas validas' }
     }
 
@@ -87,6 +135,7 @@ export default class GestorRankingVinos {
       await this.generarExcel(datosVinoConPuntaje)
       return { success: true, message: 'Excel generado correctamente' }
     }
+
     if (this.tipoVisualizacion === 'pdf') {
       await this.generarPDF(datosVinoConPuntaje)
       return { success: true, message: 'PDF generado correctamente' }
@@ -98,7 +147,7 @@ export default class GestorRankingVinos {
   public validarSiHayReseniasValidas(
     datosVinoConPuntaje: VinosConDatosYPromedio[]
   ) {
-    return datosVinoConPuntaje.length === 0
+    return datosVinoConPuntaje.length !== 0
   }
 
   public async generarExcel(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
@@ -138,7 +187,7 @@ export default class GestorRankingVinos {
   }
 
   public tomarTipoResenia(tipoResenia: string) {
-    // console.log(tipoResenia)
+    this.tipoResenia = tipoResenia
   }
 
   public validarFechasIngresadas(fechaDesde: Date, fechaHasta: Date) {

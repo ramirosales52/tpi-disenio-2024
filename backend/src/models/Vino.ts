@@ -1,5 +1,6 @@
 import Bodega from './Bodega'
 import Resenia from './Resenia'
+import { TipoReseniaStrategy } from './strategy/TipoReseniaStrategy'
 import Varietal from './Varietal'
 
 export default class Vino {
@@ -28,15 +29,13 @@ export default class Vino {
     return this.resenias.length > 0
   }
 
-  mostrarReseñasDeSommelierEnPeriodo(
+  filtrarResenias(
+    strategy: TipoReseniaStrategy,
     fechaDesde: Date,
     fechaHasta: Date
   ): Resenia[] {
-    return this.resenias.filter(
-      resenia =>
-        resenia.esDePeriodo(fechaDesde, fechaHasta) &&
-        resenia.obtenerEsPremium()
-    )
+    // METODO POLIMÓRFICO QUE DELEGARÁ LA LÓGICA DE FILTRADO DE RESEÑAS A LA ESTRATEGIA
+    return strategy.filtrarResenias(this.resenias, fechaDesde, fechaHasta)
   }
 
   calcularPromedioReseniasValidadas(resenias: Resenia[]): number {
@@ -48,10 +47,11 @@ export default class Vino {
     )
   }
 
-  obtenerInformacionVinoBodegaVarietal() {
+  obtenerInformacionVinoBodegaRegionYVarietal() {
     return {
       vino: this.getNombre(),
-      bodega: this.bodega.obtenerNombreRegionProvinciaYPais(),
+      bodega: this.getBodega(),
+      region: this.getBodega().getRegion(),
       varietales: this.varietales.map(varietal =>
         varietal.obtenerNombreYTipoUva()
       ),

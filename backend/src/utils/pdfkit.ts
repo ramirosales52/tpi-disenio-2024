@@ -14,10 +14,13 @@ export const exportVinosToPDF = async (
   doc.fontSize(18).text('Lista de Vinos', { align: 'center' })
   doc.moveDown()
 
+  console.log(datosVinos)
   // Añadir los datos de cada vino al PDF
   datosVinos.forEach(datosVino => {
     doc.fontSize(12).text(`${datosVino.vino}`, { underline: true })
-    doc.text(`Bodega: ${datosVino.bodega}`)
+    doc.text(
+      `Bodega: ${datosVino.bodega.getNombre()}, ${datosVino.provincia?.getNombre()}, ${datosVino.pais?.obtenerNombre()}`
+    )
     doc.text(`Varietales: ${datosVino.varietales}`)
     doc.text(`Puntaje: ${datosVino.puntaje}`)
     doc.text(`Precio: ${datosVino.precio}`)

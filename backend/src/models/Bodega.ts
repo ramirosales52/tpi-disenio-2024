@@ -8,13 +8,10 @@ export default class Bodega {
     this.region = region
   }
 
-  obtenerNombreRegionProvinciaYPais(): string {
-    return this.nombre + ', ' + this.region.obtenerNombreProvinciaYPais()
-  }
-
   getNombre(): string {
     return this.nombre
   }
+
   getRegion(): RegionVitivinicola {
     return this.region
   }

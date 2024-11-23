@@ -1,22 +1,27 @@
-import Pais from './Pais'
+import RegionVitivinicola from './RegionVitivinicola'
 
 export default class Provincia {
+  private regionesVitivinicolas: RegionVitivinicola[] = []
   private nombre: string
-  private pais: Pais
-  constructor(nombre: string, pais: Pais) {
+  constructor(nombre: string) {
     this.nombre = nombre
-    this.pais = pais
-  }
-
-  obtenerNombreYPais(): string {
-    return this.nombre + ', ' + this.pais.obtenerNombre()
   }
 
   getNombre(): string {
     return this.nombre
   }
 
-  getPais(): Pais {
-    return this.pais
+  agregarRegionVitivinicola(region: RegionVitivinicola) {
+    this.regionesVitivinicolas.push(region)
+  }
+
+  eliminarRegionVitivinicola(region: RegionVitivinicola) {
+    this.regionesVitivinicolas = this.regionesVitivinicolas.filter(
+      r => r !== region
+    )
+  }
+
+  esTuRegion(region: RegionVitivinicola): boolean {
+    return this.regionesVitivinicolas.includes(region)
   }
 }
