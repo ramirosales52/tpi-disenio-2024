@@ -41,36 +41,12 @@ const tipoUva4 = new TipoUva('Syrah')
 const tipoUva5 = new TipoUva('Chardonnay')
 const tipoUva6 = new TipoUva('Torrontés')
 
-const varietal1 = new Varietal(
-  'Malbec Reserva',
-  'Reserva de excelente calidad',
-  tipoUva1
-)
-const varietal2 = new Varietal(
-  'Merlot Reserva Especial',
-  'Reserva especial de Merlot',
-  tipoUva2
-)
-const varietal3 = new Varietal(
-  'Cabernet Sauvignon Gran Reserva',
-  'Gran Reserva de Cabernet Sauvignon',
-  tipoUva3
-)
-const varietal4 = new Varietal(
-  'Syrah Premium',
-  'Vino Premium de Syrah',
-  tipoUva4
-)
-const varietal5 = new Varietal(
-  'Chardonnay Select',
-  'Selección especial de Chardonnay',
-  tipoUva5
-)
-const varietal6 = new Varietal(
-  'Torrontés Clásico',
-  'Clásico Torrontés',
-  tipoUva6
-)
+const varietal1 = new Varietal('Malbec Reserva', tipoUva1)
+const varietal2 = new Varietal('Merlot Reserva Especial', tipoUva2)
+const varietal3 = new Varietal('Cabernet Sauvignon Gran Reserva', tipoUva3)
+const varietal4 = new Varietal('Syrah Premium', tipoUva4)
+const varietal5 = new Varietal('Chardonnay Select', tipoUva5)
+const varietal6 = new Varietal('Torrontés Clásico', tipoUva6)
 
 const resenia1 = new Resenia(false, new Date('2022-01-01'), 95)
 const resenia2 = new Resenia(true, new Date('2021-06-15'), 30)

@@ -20,6 +20,10 @@ export default class Pais {
   }
 
   esTuProvincia(provincia: Provincia): boolean {
-    return this.provincias.includes(provincia)
+    return this.provincias.some(p => p.getNombre() === provincia.getNombre())
+  }
+
+  getProvincias(): Provincia[] {
+    return this.provincias
   }
 }

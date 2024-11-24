@@ -2,12 +2,10 @@ import TipoUva from './TipoUva'
 
 export default class Varietal {
   private nombre: string
-  private descripcion: string
   private tipoUva: TipoUva
 
-  constructor(nombre: string, descripcion: string, tipoUva: TipoUva) {
+  constructor(nombre: string, tipoUva: TipoUva) {
     this.nombre = nombre
-    this.descripcion = descripcion
     this.tipoUva = tipoUva
   }
 
@@ -17,10 +15,6 @@ export default class Varietal {
 
   getNombre(): string {
     return this.nombre
-  }
-
-  getDescripcion(): string {
-    return this.descripcion
   }
 
   getTipoUva(): TipoUva {
@@ -33,9 +27,5 @@ export default class Varietal {
 
   setTipoUva(tipoUva: TipoUva) {
     this.tipoUva = tipoUva
-  }
-
-  setDescripcion(descripcion: string) {
-    this.descripcion = descripcion
   }
 }

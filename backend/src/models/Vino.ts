@@ -1,3 +1,4 @@
+import database from '../../database'
 import Bodega from './Bodega'
 import Resenia from './Resenia'
 import { TipoReseniaStrategy } from './strategy/TipoReseniaStrategy'

@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-
 import path from 'node:path'
 
 import GestorRankingVinos from './controllers/GestorRankingVinos'
@@ -12,11 +11,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Sirve archivos estáticos
 app.use('/static', express.static(path.join(__dirname, './output')))
 
+const gestor = new GestorRankingVinos()
 app.post('/generar-ranking', async (req: Request, res: Response) => {
-  const gestor = new GestorRankingVinos()
   const { body } = req
   const {
     fechaDesde,

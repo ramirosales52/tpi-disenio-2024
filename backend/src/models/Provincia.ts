@@ -11,6 +11,10 @@ export default class Provincia {
     return this.nombre
   }
 
+  getRegionesVitivinicolas(): RegionVitivinicola[] {
+    return this.regionesVitivinicolas
+  }
+
   agregarRegionVitivinicola(region: RegionVitivinicola) {
     this.regionesVitivinicolas.push(region)
   }
@@ -22,6 +26,8 @@ export default class Provincia {
   }
 
   esTuRegion(region: RegionVitivinicola): boolean {
-    return this.regionesVitivinicolas.includes(region)
+    return this.regionesVitivinicolas.some(
+      r => r.getNombre() === region.getNombre()
+    )
   }
 }

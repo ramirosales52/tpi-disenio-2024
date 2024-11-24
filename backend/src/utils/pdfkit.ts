@@ -14,8 +14,6 @@ export const exportVinosToPDF = async (
   doc.fontSize(18).text('Lista de Vinos', { align: 'center' })
   doc.moveDown()
 
-  console.log(datosVinos)
-  // Añadir los datos de cada vino al PDF
   datosVinos.forEach(datosVino => {
     doc.fontSize(12).text(`${datosVino.vino}`, { underline: true })
     doc.text(

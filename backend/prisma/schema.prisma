@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../db.sqlite"
+}
+
+
+// MODELS
+model TipoUva {
+  id      Int      @id @default(autoincrement())
+  nombre  String
+  varieta Varietal[]
+}
+
+model Varietal {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  tipoUva  TipoUva  @relation(fields: [tipoUvaId], references: [id]) // Relación con TipoUva
+  tipoUvaId Int    // Clave foránea explícita
+  vinos Vino[]
+}
+
+model Provincia {
+  id      Int      @id @default(autoincrement())
+  nombre   String
+
+  // FK
+  pais Pais @relation(fields: [paisId], references: [id]) // Relación con Pais
+  paisId  Int
+  regionesVitivinicola RegionVitivinicola[]
+}
+
+model Pais {
+  id      Int      @id @default(autoincrement())
+  nombre   String
+  // FK
+
+  provincias Provincia[]
+}
+model RegionVitivinicola {
+  id      Int      @id @default(autoincrement())
+  nombre   String
+
+  // FK
+  provincia Provincia @relation(fields: [provinciaId], references: [id]) // Relación con Provincia
+  provinciaId Int
+  bodegas Bodega[]
+}
+
+
+
+model Bodega {
+  id      Int      @id @default(autoincrement())
+  nombre   String
+  regionVitivinicola RegionVitivinicola @relation(fields: [regionVitivinicolaId], references: [id]) // Relación con RegionVitivinicola
+  regionVitivinicolaId Int
+  vinos Vino[]
+}
+
+model Vino {
+  id      Int      @id @default(autoincrement())
+  nombre   String
+  precio Decimal
+
+  // Foreing keys
+  resenias Resenia[]
+  varietales Varietal[]
+  bodega Bodega @relation(fields: [bodegaId], references: [id]) // Relación con Bodega
+  bodegaId Int
+}
+
+model Resenia {
+  id      Int      @id @default(autoincrement())
+  esPremium Boolean
+  fechaResenia DateTime
+  puntaje Int
+  vino Vino @relation(fields: [vinoId], references: [id]) // Relación con Vino
+  vinoId Int
+}
+
+
+
+

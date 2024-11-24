@@ -1,15 +1,21 @@
-import Vino from '../models/Vino'
-
-import { vinos, paisesDB, provinciasDB } from '../data/data'
-import { exportVinosToExcel } from '../utils/exceljs'
 import { exportVinosToPDF } from '../utils/pdfkit'
+import { exportVinosToExcel } from '../utils/exceljs'
+import Entidades from '../utils/Entidades'
+
 import { type VinosConDatosYPromedio } from '../types'
-import Provincia from '../models/Provincia'
+
+import VinoService from '../services/VinoService'
+
+import Vino from '../models/Vino'
 import Pais from '../models/Pais'
+import Provincia from '../models/Provincia'
+
 import { SommelierStrategy } from '../models/strategy/SommelierStrategy'
 import { TipoReseniaStrategy } from '../models/strategy/TipoReseniaStrategy'
 import { AmigoStrategy } from '../models/strategy/AmigoStrategy'
 import { NormalStrategy } from '../models/strategy/NormalStrategy'
+
+import Mapper from '../mapper/Mapper'
 
 export default class GestorRankingVinos {
   private fechaDesde: Date = new Date()
@@ -17,14 +23,40 @@ export default class GestorRankingVinos {
   private tipoResenia: string = ''
   private strategy: TipoReseniaStrategy | undefined
   private tipoVisualizacion?: string
-  private vinosConResenias: Array<Vino> = []
   private vinosConPuntaje: Map<Vino, number>[] = []
   private provincias: Provincia[] = []
   private paises: Pais[] = []
+  private vinos: Vino[] = []
 
   constructor() {
-    this.provincias = provinciasDB
-    this.paises = paisesDB
+    this.fetchBaseDeDatos()
+  }
+
+  public async fetchBaseDeDatos() {
+    // Traemos los vinos desde la base de datos
+    const vinosDB = await VinoService.getAllVinos()
+    // Mapper para cargar vinos y gestionar la unicidad
+    for (const vinoDB of vinosDB) {
+      const pais = Entidades.getOrCreatePais(
+        this.paises,
+        vinoDB.bodega.regionVitivinicola.provincia.pais.nombre
+      )
+      const provincia = Entidades.getOrCreateProvincia(
+        pais.getProvincias(),
+        vinoDB.bodega.regionVitivinicola.provincia.nombre
+      )
+      const region = Entidades.getOrCreateRegion(
+        provincia.getRegionesVitivinicolas(),
+        vinoDB.bodega.regionVitivinicola.nombre
+      )
+      pais.agregarProvincia(provincia)
+      provincia.agregarRegionVitivinicola(region)
+
+      const vino = new Mapper().mapVino(vinoDB)
+      this.addPais(pais)
+      this.addProvincia(provincia)
+      this.addVino(vino)
+    }
   }
 
   public async generarRankingVinos(): Promise<{
@@ -42,7 +74,7 @@ export default class GestorRankingVinos {
     }
 
     // Filtrar vinos que tengan al menos una reseña
-    this.vinosConResenias = vinos.filter(vino => {
+    this.vinos.forEach(vino => {
       if (!vino.tieneResenias()) {
         return
       }
@@ -200,5 +232,15 @@ export default class GestorRankingVinos {
     return {
       error: false,
     }
+  }
+
+  private addProvincia(provincia: Provincia): void {
+    this.provincias.push(provincia)
+  }
+  private addPais(pais: Pais): void {
+    this.paises.push(pais)
+  }
+  private addVino(vino: Vino): void {
+    this.vinos.push(vino)
   }
 }
