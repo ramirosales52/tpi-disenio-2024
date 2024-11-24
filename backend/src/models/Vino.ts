@@ -40,11 +40,13 @@ export default class Vino {
   }
 
   calcularPromedioReseniasValidadas(resenias: Resenia[]): number {
-    return (
-      resenias.reduce(
-        (acumulador, resenia) => acumulador + resenia.obtenerPuntaje(),
-        0
-      ) / resenias.length
+    return parseFloat(
+      (
+        resenias.reduce(
+          (acumulador, resenia) => acumulador + resenia.obtenerPuntaje(),
+          0
+        ) / resenias.length
+      ).toFixed(2)
     )
   }
 

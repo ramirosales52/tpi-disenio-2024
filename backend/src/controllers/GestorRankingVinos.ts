@@ -1,6 +1,8 @@
 import { exportVinosToPDF } from '../utils/pdfkit'
 import { exportVinosToExcel } from '../utils/exceljs'
+
 import Entidades from '../utils/Entidades'
+import { FetchDatabaseException } from '../exceptions/FetchDatabaseException'
 
 import { type VinosConDatosYPromedio } from '../types'
 
@@ -16,6 +18,7 @@ import { AmigoStrategy } from '../models/strategy/AmigoStrategy'
 import { NormalStrategy } from '../models/strategy/NormalStrategy'
 
 import Mapper from '../mapper/Mapper'
+import { PDFExporter } from '../boundary/PDFExporter'
 
 export default class GestorRankingVinos {
   private fechaDesde: Date = new Date()
@@ -29,40 +32,57 @@ export default class GestorRankingVinos {
   private vinos: Vino[] = []
 
   constructor() {
-    this.fetchBaseDeDatos()
+    try {
+      this.fetchBaseDeDatos()
+    } catch (error) {
+      if (error instanceof FetchDatabaseException) {
+        throw new FetchDatabaseException(error.message)
+      }
+      throw new Error(error as string)
+    }
   }
 
   public async fetchBaseDeDatos() {
-    // Traemos los vinos desde la base de datos
-    const vinosDB = await VinoService.getAllVinos()
-    // Mapper para cargar vinos y gestionar la unicidad
-    for (const vinoDB of vinosDB) {
-      const pais = Entidades.getOrCreatePais(
-        this.paises,
-        vinoDB.bodega.regionVitivinicola.provincia.pais.nombre
-      )
-      const provincia = Entidades.getOrCreateProvincia(
-        pais.getProvincias(),
-        vinoDB.bodega.regionVitivinicola.provincia.nombre
-      )
-      const region = Entidades.getOrCreateRegion(
-        provincia.getRegionesVitivinicolas(),
-        vinoDB.bodega.regionVitivinicola.nombre
-      )
-      pais.agregarProvincia(provincia)
-      provincia.agregarRegionVitivinicola(region)
-
-      const vino = new Mapper().mapVino(vinoDB)
-      this.addPais(pais)
-      this.addProvincia(provincia)
-      this.addVino(vino)
-    }
+    await VinoService.getAllVinos()
+      .then(vinosDB => {
+        vinosDB.forEach(vinoDB => {
+          const pais = Entidades.getOrCreatePais(
+            this.paises,
+            vinoDB.bodega.regionVitivinicola.provincia.pais.nombre
+          )
+          const provincia = Entidades.getOrCreateProvincia(
+            pais.getProvincias(),
+            vinoDB.bodega.regionVitivinicola.provincia.nombre
+          )
+          const region = Entidades.getOrCreateRegion(
+            provincia.getRegionesVitivinicolas(),
+            vinoDB.bodega.regionVitivinicola.nombre
+          )
+          pais.agregarProvincia(provincia)
+          provincia.agregarRegionVitivinicola(region)
+          const vino = new Mapper().mapVino(vinoDB)
+          this.addPais(pais)
+          this.addProvincia(provincia)
+          this.addVino(vino)
+        })
+      })
+      .catch(err => {
+        // pantalla.mostrarError(err)
+        throw new Error(err)
+      })
   }
 
   public async generarRankingVinos(): Promise<{
     success: boolean
     message: string
   }> {
+    // Validar que haya vinos
+    if (this.vinos.length === 0) {
+      return { success: false, message: 'No hay vinos' }
+    }
+
+    // Dependiendo del tipo de reseña, creamos la estrategia correspondiente
+    // PATRON STRATEGY
     if (this.tipoResenia === 'sommelier') {
       this.strategy = new SommelierStrategy()
     }
@@ -94,6 +114,7 @@ export default class GestorRankingVinos {
 
       // Calculamos el puntaje promedio de las reseñas
       // Lo hacemos en el vino para no repetir código por cada estrategia
+
       const puntaje = vino.calcularPromedioReseniasValidadas(reseniasEnPeriodo)
 
       // Creamos un nuevo map para el vino con el puntaje promedio
@@ -105,6 +126,9 @@ export default class GestorRankingVinos {
     // Ordenamos los vinos y tomamos los primeros 10
     this.ordenarVinosSegunCalificacion()
     const { success, message } = await this.obtenerTopTenVinosConInformacion()
+
+    // Limpiamos la lista de vinos con puntaje para que no se acumulen
+    this.vinosConPuntaje = []
     return { success, message }
   }
 
@@ -187,7 +211,8 @@ export default class GestorRankingVinos {
   }
 
   public async generarPDF(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
-    await exportVinosToPDF(datosVinoConPuntaje)
+    new PDFExporter().exportVinosToPDF(datosVinoConPuntaje)
+    // await exportVinosToPDF(datosVinoConPuntaje)
   }
 
   public opcionGenerarRankingVinos(): void {
