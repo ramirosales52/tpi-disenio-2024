@@ -7,7 +7,7 @@ export default class Pais {
     this.nombre = nombre
   }
 
-  obtenerNombre(): string {
+  getNombre(): string {
     return this.nombre
   }
 

@@ -21,7 +21,7 @@ export default class Provincia {
 
   eliminarRegionVitivinicola(region: RegionVitivinicola) {
     this.regionesVitivinicolas = this.regionesVitivinicolas.filter(
-      r => r !== region
+      r => r.getNombre() !== region.getNombre()
     )
   }
 

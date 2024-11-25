@@ -1,2 +1,4 @@
 /node_modules
-db.sqlite
+db.sqlite*
+/src/output/vinos.pdf
+/src/output/vinos.xlsx

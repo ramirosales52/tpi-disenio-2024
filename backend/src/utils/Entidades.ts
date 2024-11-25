@@ -15,7 +15,7 @@ export default class Entidades {
   }
 
   public static getOrCreatePais(paises: Pais[], nombre: string): Pais {
-    let pais = paises.find(p => p.obtenerNombre() === nombre)
+    let pais = paises.find(p => p.getNombre() === nombre)
     if (!pais) {
       pais = new Pais(nombre)
     }

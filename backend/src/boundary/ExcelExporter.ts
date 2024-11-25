@@ -2,8 +2,9 @@ import Excel from 'exceljs'
 import path from 'node:path'
 
 import { type VinosConDatosYPromedio } from '../types'
+import { InterfazExcel } from './InterfazExcel'
 
-export class ExcelExporter {
+export class ExcelExporter implements InterfazExcel {
   private exportPath: string
 
   constructor(

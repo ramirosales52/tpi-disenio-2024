@@ -1,6 +1,3 @@
-import { exportVinosToPDF } from '../utils/pdfkit'
-import { exportVinosToExcel } from '../utils/exceljs'
-
 import Entidades from '../utils/Entidades'
 import { FetchDatabaseException } from '../exceptions/FetchDatabaseException'
 
@@ -19,6 +16,8 @@ import { NormalStrategy } from '../models/strategy/NormalStrategy'
 
 import Mapper from '../mapper/Mapper'
 import { PDFExporter } from '../boundary/PDFExporter'
+import { ExcelExporter } from '../boundary/ExcelExporter'
+import RegionVitivinicola from '../models/RegionVitivinicola'
 
 export default class GestorRankingVinos {
   private fechaDesde: Date = new Date()
@@ -42,7 +41,7 @@ export default class GestorRankingVinos {
     }
   }
 
-  public async fetchBaseDeDatos() {
+  private async fetchBaseDeDatos() {
     await VinoService.getAllVinos()
       .then(vinosDB => {
         vinosDB.forEach(vinoDB => {
@@ -114,12 +113,12 @@ export default class GestorRankingVinos {
 
       // Calculamos el puntaje promedio de las reseñas
       // Lo hacemos en el vino para no repetir código por cada estrategia
-
-      const puntaje = vino.calcularPromedioReseniasValidadas(reseniasEnPeriodo)
+      const promedioReseniasValidadas =
+        vino.calcularPromedioReseniasValidadas(reseniasEnPeriodo)
 
       // Creamos un nuevo map para el vino con el puntaje promedio
       const map = new Map<Vino, number>()
-      map.set(vino, puntaje)
+      map.set(vino, promedioReseniasValidadas)
       this.vinosConPuntaje.push(map)
     })
 
@@ -144,6 +143,8 @@ export default class GestorRankingVinos {
     // Tomamos los primeros 10 vinos de la lista ordenada
     const top10VinosConPuntaje = this.vinosConPuntaje.slice(0, 10)
 
+    // ESTA VARIABLE CONTIENE SOLO VALORES PRIMITIVOS
+    // Para que pueda ser exportable a Excel o PDF
     const datosVinoConPuntaje = top10VinosConPuntaje.map(vinoConPuntaje => {
       const vino = vinoConPuntaje.keys().next().value
       if (!vino) {
@@ -154,29 +155,41 @@ export default class GestorRankingVinos {
 
       // Obtenemos la información del vino y le agregamos el puntaje promedio
       const datosVino = vino.obtenerInformacionVinoBodegaRegionYVarietal()
+      const [regionNombre, region] = datosVino.region as [
+        string,
+        RegionVitivinicola
+      ]
 
       const datosVinoConPuntaje: VinosConDatosYPromedio = {
         ...datosVino,
+        // Seteamos solo el nombre de la región
+        // El puntero solo lo necesitaba para buscar la provincia
+        region: regionNombre,
         puntaje: puntaje || 0,
       }
 
-      // Buscamos entre todas las provincias la que contienen la región del vino
-      const provinciaEncontrada = this.provincias.find(provincia =>
-        provincia.esTuRegion(datosVinoConPuntaje.region)
-      )
+      const provinciaEncontrada = this.provincias.find(provincia => {
+        if (provincia.esTuRegion(region)) {
+          datosVinoConPuntaje.provincia = provincia.getNombre()
+          return true
+        }
+        return false
+      })
+
       if (!provinciaEncontrada) {
         throw new Error('Provincia no encontrada')
       }
-      datosVinoConPuntaje.provincia = provinciaEncontrada
 
-      // Buscar país que contenga la provincia
-      const paisEncontrado = this.paises.find(pais =>
-        pais.esTuProvincia(provinciaEncontrada)
-      )
+      const paisEncontrado = this.paises.find(pais => {
+        if (pais.esTuProvincia(provinciaEncontrada)) {
+          datosVinoConPuntaje.pais = pais.getNombre()
+          return true
+        }
+        return false
+      })
       if (!paisEncontrado) {
         throw new Error('País no encontrado')
       }
-      datosVinoConPuntaje.pais = paisEncontrado
 
       return datosVinoConPuntaje
     })
@@ -187,6 +200,7 @@ export default class GestorRankingVinos {
     }
 
     // Creamos el PDF o el Excel dependiendo del pedido del usuario
+    // A ESTE PUNTO YA TENEMOS LOS DATOS DE LOS VINOS CON SU PUNTAJE
     if (this.tipoVisualizacion === 'xlsx') {
       await this.generarExcel(datosVinoConPuntaje)
       return { success: true, message: 'Excel generado correctamente' }
@@ -207,12 +221,11 @@ export default class GestorRankingVinos {
   }
 
   public async generarExcel(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
-    await exportVinosToExcel(datosVinoConPuntaje)
+    await new ExcelExporter().exportVinosToExcel(datosVinoConPuntaje)
   }
 
   public async generarPDF(datosVinoConPuntaje: VinosConDatosYPromedio[]) {
-    new PDFExporter().exportVinosToPDF(datosVinoConPuntaje)
-    // await exportVinosToPDF(datosVinoConPuntaje)
+    await new PDFExporter().exportVinosToPDF(datosVinoConPuntaje)
   }
 
   public opcionGenerarRankingVinos(): void {

@@ -8,6 +8,10 @@ export default class Bodega {
     this.region = region
   }
 
+  obtenerNombreYRegion() {
+    return [this.getNombre(), [this.region.getNombre(), this.getRegion()]]
+  }
+
   getNombre(): string {
     return this.nombre
   }

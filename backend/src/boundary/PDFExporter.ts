@@ -3,16 +3,20 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { type VinosConDatosYPromedio } from '../types'
+import { InterfazPDF } from './InterfazPDF'
 
 /**
  * Clase responsable de la exportación de datos de vinos a PDF.
  * Actúa como un Boundary en la arquitectura del sistema.
  */
-export class PDFExporter {
+export class PDFExporter implements InterfazPDF {
   private exportPath: string
 
   constructor(exportDir: string = '../output', fileName: string = 'vinos.pdf') {
     this.exportPath = path.resolve(__dirname, exportDir, fileName)
+  }
+  exportVinosToExcel(datosVinos: VinosConDatosYPromedio[]): Promise<void> {
+    throw new Error('Method not implemented.')
   }
 
   // Genera un archivo PDF con los datos de los vinos.
@@ -30,7 +34,7 @@ export class PDFExporter {
     datosVinos.forEach(datosVino => {
       doc.fontSize(12).text(`${datosVino.vino}`, { underline: true })
       doc.text(
-        `Bodega: ${datosVino.bodega.getNombre()}, ${datosVino.provincia?.getNombre()}, ${datosVino.pais?.obtenerNombre()}`
+        `Bodega: ${datosVino.bodega}, ${datosVino.provincia}, ${datosVino.pais}`
       )
       doc.text(`Varietales: ${datosVino.varietales}`)
       doc.text(`Puntaje: ${datosVino.puntaje}`)

@@ -10,15 +10,11 @@ export default class Varietal {
   }
 
   obtenerNombreYTipoUva(): string {
-    return `${this.nombre} - Tipo Uva: ${this.tipoUva.getTipoUva()}`
+    return `${this.getNombre()} - Tipo Uva: ${this.tipoUva.getNombre()}`
   }
 
   getNombre(): string {
     return this.nombre
-  }
-
-  getTipoUva(): TipoUva {
-    return this.tipoUva
   }
 
   setNombre(nombre: string) {

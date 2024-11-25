@@ -4,7 +4,7 @@ export default class RegionVitivinicola {
     this.nombre = nombre
   }
 
-  getNombre(): string {
+  public getNombre(): string {
     return this.nombre
   }
 }

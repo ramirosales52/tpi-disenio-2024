@@ -1,5 +1,5 @@
-import database from '../../database'
 import Bodega from './Bodega'
+import RegionVitivinicola from './RegionVitivinicola'
 import Resenia from './Resenia'
 import { TipoReseniaStrategy } from './strategy/TipoReseniaStrategy'
 import Varietal from './Varietal'
@@ -51,10 +51,16 @@ export default class Vino {
   }
 
   obtenerInformacionVinoBodegaRegionYVarietal() {
+    const [bodega, [nombreRegion, region]] =
+      this.bodega.obtenerNombreYRegion() as [
+        string,
+        [string, RegionVitivinicola]
+      ]
+
     return {
       vino: this.getNombre(),
-      bodega: this.getBodega(),
-      region: this.getBodega().getRegion(),
+      bodega,
+      region: [nombreRegion, region],
       varietales: this.varietales.map(varietal =>
         varietal.obtenerNombreYTipoUva()
       ),
