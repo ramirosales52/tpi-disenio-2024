@@ -17,10 +17,7 @@ export default class Resenia {
   }
 
   esDePeriodo(fechaInicio: Date, fechaFin: Date): boolean {
-    return (
-      this.getFechaResenia() >= fechaInicio &&
-      this.getFechaResenia() <= fechaFin
-    )
+    return this.fechaResenia >= fechaInicio && this.fechaResenia <= fechaFin
   }
 
   getFechaResenia(): Date {
