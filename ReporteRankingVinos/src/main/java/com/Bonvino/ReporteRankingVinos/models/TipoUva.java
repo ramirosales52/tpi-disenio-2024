@@ -4,21 +4,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+
+@Data
 @Entity
-@Getter
-@Setter
+@NoArgsConstructor
 public class TipoUva {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
   private String nombre;
 
-  public TipoUva(String nombre, String descripcion) {
+  public TipoUva(String nombre) {
     this.nombre = nombre;
-
   }
 
   public String getNombre() {

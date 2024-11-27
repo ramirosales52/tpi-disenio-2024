@@ -5,10 +5,9 @@ import java.util.*;
 import com.Bonvino.ReporteRankingVinos.models.TipoUva;
 import com.Bonvino.ReporteRankingVinos.models.Varietal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.Bonvino.ReporteRankingVinos.exceptions.NotFoundException;
 import com.Bonvino.ReporteRankingVinos.models.Vino;
@@ -19,17 +18,20 @@ import com.Bonvino.ReporteRankingVinos.models.strategy.ITipoReporteStrategy;
 import com.Bonvino.ReporteRankingVinos.services.IVinoService;
 
 @RestController
+//@RequestMapping("/ranking-vinos")
+
 public class GestorRankingVinos {
 
   @Autowired
   private IVinoService vinoService;
 
+  @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/generar-ranking")
   public ResponseEntity<Object> generarRankingVinos(
-      @RequestParam Date fechaDesde,
-      @RequestParam Date fechaHasta,
-      @RequestParam String tipoVisualizacion,
-      @RequestParam String tipoResenia) {
+          @RequestParam @DateTimeFormat(pattern = "yyyy-mm-dd") Date fechaDesde,
+          @RequestParam @DateTimeFormat(pattern = "yyyy-mm-dd") Date fechaHasta,
+          @RequestParam String tipoVisualizacion,
+          @RequestParam String tipoResenia) {
     // Llamado a la base de datos para obtener los vinos
     List<Vino> vinos = vinoService.getAllVinos();
     if (vinos.isEmpty()) {
@@ -42,29 +44,36 @@ public class GestorRankingVinos {
      List<String> reseniasValidas = tipoReporteStrategy.obtenerVinosConPuntaje(vinos, fechaDesde, fechaHasta);
     */
       // Comienza loop en vinos
-      List<Map<Vino, Float>> vinosYPuntaje = new ArrayList<>(vinos.stream().map(vino -> {
-          float puntaje = vino.mostrarReseniasDeSommelierEnPeriodo(fechaDesde, fechaHasta);
+      List<Map<Vino, Double>> vinosYPuntaje = new ArrayList<>(vinos.stream().map(vino -> {
+          double puntaje = vino.mostrarReseniasDeSommelierEnPeriodo(fechaDesde, fechaHasta);
+          if(puntaje == 0) {
+              return null;
+          }
           return new HashMap<>(Map.of(vino, puntaje));
-      }).toList());
+      }).filter(Objects::nonNull).toList());
 
       this.ordenarVinosSegunPuntaje(vinosYPuntaje);
 
-      return ResponseEntity.noContent().build();
+      List<List<String>> topTenVinosConInformacion = this.obtenerTopTenVinosConInformacion(vinosYPuntaje);
+
+      return ResponseEntity.ok(topTenVinosConInformacion);
+
+//      return ResponseEntity.noContent().build();
   }
 
-  private void ordenarVinosSegunPuntaje(List<Map<Vino, Float>> vinosYPuntaje) {
+  private void ordenarVinosSegunPuntaje(List<Map<Vino, Double>> vinosYPuntaje) {
       vinosYPuntaje.sort((mapaA, mapaB) -> {
-          float maxA = mapaA.values().stream().max(Float::compare).orElse(0f);
-          float maxB = mapaB.values().stream().max(Float::compare).orElse(0f);
-          return Float.compare(maxA, maxB);
+          double maxA = mapaA.values().stream().max(Double::compare).orElse(0.0);
+          double maxB = mapaB.values().stream().max(Double::compare).orElse(0.0);
+          return Double.compare(maxB, maxA);
       });
   }
 
-    private List<List<String>> obtenerTopTenVinosConInformacion(List<Map<Vino, Float>> vinosYPuntaje) {
+    private List<List<String>> obtenerTopTenVinosConInformacion(List<Map<Vino, Double>> vinosYPuntaje) {
       return vinosYPuntaje.subList(0, Math.min(10, vinosYPuntaje.size())).stream()
           .map(mapa -> {
               Vino vino = mapa.keySet().iterator().next();
-              float puntaje = mapa.values().iterator().next();
+              double puntaje = mapa.values().iterator().next();
               return List.of(
                       String.valueOf(puntaje),
                       vino.getNombre(), String.valueOf(vino.getPrecio()),

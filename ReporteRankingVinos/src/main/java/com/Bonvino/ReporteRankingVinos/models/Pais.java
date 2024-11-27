@@ -2,16 +2,15 @@ package com.Bonvino.ReporteRankingVinos.models;
 
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class Pais {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +19,11 @@ public class Pais {
   @Getter
   private  String nombre;
 
+  @OneToMany(mappedBy = "pais", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Provincia> provincias;
 
   public Pais(String nombre) {
     this.nombre = nombre;
   }
+
 }

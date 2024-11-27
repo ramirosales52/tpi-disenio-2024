@@ -4,12 +4,13 @@ import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+
+@Data
 @Entity
+@NoArgsConstructor
 public class Vino {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +23,8 @@ public class Vino {
   @OneToMany(mappedBy = "vino", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = false)
   private List<Resenia> resenias;
 
-  @OneToMany(mappedBy = "vino", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = false)
+  @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "vino_varietal", joinColumns = @JoinColumn(name = "vinoId"), inverseJoinColumns = @JoinColumn(name = "varietalId"))
   private List<Varietal> varietales;
 
   @ManyToOne
@@ -38,16 +40,20 @@ public class Vino {
     return !this.resenias.isEmpty();
   }
 
-  public float mostrarReseniasDeSommelierEnPeriodo(Date fechaDesde, Date fechaHasta) {
-    List<Resenia> reseniasDeSommelierEnPeriodo= this.resenias.stream()
+  public double mostrarReseniasDeSommelierEnPeriodo(Date fechaDesde, Date fechaHasta) {
+    List<Resenia> reseniasDeSommelierEnPeriodo = this.resenias.stream()
         .filter(resenia -> resenia.esDePeriodo(fechaDesde,  fechaHasta))
         .filter(Resenia::obtenerEsPremium)
         .toList();
 
+    if (reseniasDeSommelierEnPeriodo.isEmpty()) {
+      return 0;
+    }
+
     return calcularPromedioReseniasValidadas(reseniasDeSommelierEnPeriodo);
   }
 
-  private float calcularPromedioReseniasValidadas(@org.jetbrains.annotations.NotNull List<Resenia> resenias) {
-    return (float) resenias.stream().mapToDouble(Resenia::obtenerPuntaje).average().orElse(0);
+  private double calcularPromedioReseniasValidadas(List<Resenia> resenias) {
+    return (double) resenias.stream().mapToDouble(Resenia::obtenerPuntaje).average().orElse(0);
   }
 }

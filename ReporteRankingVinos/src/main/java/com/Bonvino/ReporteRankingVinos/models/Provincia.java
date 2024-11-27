@@ -10,12 +10,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
 @Entity
-@Getter
-@Setter
+@NoArgsConstructor
 public class Provincia {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
