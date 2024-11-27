@@ -14,14 +14,14 @@ app.use(express.json())
 app.use('/static', express.static(path.join(__dirname, './output')))
 
 const gestor = new GestorRankingVinos()
-app.post('/generar-ranking', async (req: Request, res: Response) => {
-  const { body } = req
+app.get('/generar-ranking', async (req: Request, res: Response) => {
+  const { query } = req as { query: { [key: string]: string } }
   const {
     fechaDesde,
     fechaHasta,
     tipoVisualizacion,
     tipoResenia = 'sommelier',
-  } = body
+  } = query
 
   const { error } = gestor.tomarFechasIngresadas(
     new Date(fechaDesde),
