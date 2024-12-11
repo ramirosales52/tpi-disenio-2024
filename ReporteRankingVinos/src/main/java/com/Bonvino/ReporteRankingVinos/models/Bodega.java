@@ -9,7 +9,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Entity
 @NoArgsConstructor
@@ -24,7 +23,7 @@ public class Bodega {
   @JoinColumn(name = "regionId", nullable = false)
   private RegionVitivinicola region;
 
-  public String obtenerNombreRegionProvinciaYPais(){
+  public String obtenerNombreRegionProvinciaYPais() {
     return this.getNombre() + ", " + this.region.getNombreProvinciaYPais();
   }
 

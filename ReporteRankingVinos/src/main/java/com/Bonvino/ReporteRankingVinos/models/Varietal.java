@@ -9,7 +9,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Entity
 @NoArgsConstructor
@@ -33,4 +32,7 @@ public class Varietal {
     return this.nombre;
   }
 
+  public String obtenerNombreYTipoUva() {
+    return this.getNombre() + " - " + this.tipoUva.getNombre();
+  }
 }

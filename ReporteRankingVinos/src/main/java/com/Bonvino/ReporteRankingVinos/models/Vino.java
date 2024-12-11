@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Entity
 @NoArgsConstructor
@@ -24,7 +23,7 @@ public class Vino {
   private List<Resenia> resenias;
 
   @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "vino_varietal", joinColumns = @JoinColumn(name = "vinoId"), inverseJoinColumns = @JoinColumn(name = "varietalId"))
+  @JoinTable(name = "vino_varietal", joinColumns = @JoinColumn(name = "vinoId"), inverseJoinColumns = @JoinColumn(name = "varietalId"))
   private List<Varietal> varietales;
 
   @ManyToOne
@@ -42,7 +41,7 @@ public class Vino {
 
   public double mostrarReseniasDeSommelierEnPeriodo(Date fechaDesde, Date fechaHasta) {
     List<Resenia> reseniasDeSommelierEnPeriodo = this.resenias.stream()
-        .filter(resenia -> resenia.esDePeriodo(fechaDesde,  fechaHasta))
+        .filter(resenia -> resenia.esDePeriodo(fechaDesde, fechaHasta))
         .filter(Resenia::obtenerEsPremium)
         .toList();
 
@@ -51,6 +50,12 @@ public class Vino {
     }
 
     return calcularPromedioReseniasValidadas(reseniasDeSommelierEnPeriodo);
+  }
+
+  public String obtenerInformacionVinoBodegaYVarietal() {
+    return this.getNombre() + " - " + String.valueOf(this.getPrecio()) + " - "
+        + this.bodega.obtenerNombreRegionProvinciaYPais() + " - "
+        + this.varietales.stream().map(Varietal::getNombre).toList();
   }
 
   private double calcularPromedioReseniasValidadas(List<Resenia> resenias) {
