@@ -24,7 +24,7 @@ public class Resenia {
   private Date fechaResenia;
 
   @ManyToOne
-  @JoinColumn(name = "vinoId", nullable = false)
+  @JoinColumn(name = "vino_id", nullable = false)
   private Vino vino;
 
   public Resenia(boolean esPremium, Integer puntaje, Date fechaResenia) {
@@ -37,7 +37,7 @@ public class Resenia {
     return this.puntaje;
   }
 
-  public boolean obtenerEsPremium() {
+  public boolean sosDeSommelier() {
     return this.esPremium;
   }
 

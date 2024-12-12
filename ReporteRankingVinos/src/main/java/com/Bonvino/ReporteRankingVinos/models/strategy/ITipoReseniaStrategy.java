@@ -8,6 +8,8 @@ import com.Bonvino.ReporteRankingVinos.models.Vino;
 
 public interface ITipoReseniaStrategy {
 
-  List<Map<Vino, Double>> obtenerVinosConPuntaje(List<Vino> vinos, Date fechaInicio, Date fechaFin);
+  List<Map<Vino, Double>> obtenerVinosConPromedio(List<Vino> vinos, Date fechaInicio, Date fechaFin);
+
+  double calcularPromedioReseniasValidadas(List<Integer> puntajeResenias);
 
 }

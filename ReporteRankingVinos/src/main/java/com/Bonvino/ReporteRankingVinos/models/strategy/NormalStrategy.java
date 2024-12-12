@@ -5,14 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.Bonvino.ReporteRankingVinos.models.Resenia;
 import com.Bonvino.ReporteRankingVinos.models.Vino;
 
 public class NormalStrategy implements ITipoReseniaStrategy {
 
   /// Calificar Vinos
   // Creamos el List<String> para exportar a excel o pdf
-  public List<Map<Vino, Double>> obtenerVinosConPuntaje(List<Vino> vinos, Date fechaInicio, Date fechaFin) {
+  public List<Map<Vino, Double>> obtenerVinosConPromedio(List<Vino> vinos, Date fechaInicio, Date fechaFin) {
     List<Map<Vino, Double>> vinosYPuntaje = new ArrayList<Map<Vino, Double>>();
     // Mientras haya vinos
     vinos.forEach(
@@ -22,8 +21,7 @@ public class NormalStrategy implements ITipoReseniaStrategy {
             vino.getResenias().forEach(
                 resenia -> {
                   if (resenia.esDePeriodo(fechaFin, fechaFin)) {
-                    // TODO: Cambiar nombre a sosDeSommelier()
-                    if (resenia.obtenerEsPremium()) {
+                    if (resenia.sosDeSommelier()) {
                       puntajeResenias.add(resenia.getPuntaje());
                     }
                   }
@@ -32,6 +30,10 @@ public class NormalStrategy implements ITipoReseniaStrategy {
           }
         });
     return vinosYPuntaje;
+  }
+
+  public double calcularPromedioReseniasValidadas(List<Integer> puntajeResenias) {
+    return puntajeResenias.stream().mapToInt(Integer::intValue).average().orElse(0);
   }
 
 }

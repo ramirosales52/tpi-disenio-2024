@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @Entity
@@ -17,7 +16,7 @@ public class Pais {
   private Integer id;
 
   @Getter
-  private  String nombre;
+  private String nombre;
 
   @OneToMany(mappedBy = "pais", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Provincia> provincias;

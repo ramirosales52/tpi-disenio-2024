@@ -19,13 +19,16 @@ import com.Bonvino.ReporteRankingVinos.services.IVinoService;
 // @RequestMapping("/ranking-vinos")
 
 public class GestorRankingVinos {
+  private ITipoReseniaStrategy strategy;
+  @SuppressWarnings("unused")
+  private String tipoVisualizacion;
 
   @Autowired
   private IVinoService vinoService;
 
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/generar-ranking")
-  public ResponseEntity<Object> generarRankingVinos(
+  public ResponseEntity<Object> get(
       @RequestParam @DateTimeFormat(pattern = "yyyy-mm-dd") Date fechaDesde,
       @RequestParam @DateTimeFormat(pattern = "yyyy-mm-dd") Date fechaHasta,
       @RequestParam String tipoVisualizacion,
@@ -36,28 +39,25 @@ public class GestorRankingVinos {
       throw new NotFoundException("No hay vinos en la base de datos");
     }
 
-    /*
-     * llamada a this.crearEstrategia()
-     * ITipoReporteStrategy tipoReporteStrategy =
-     * this.crearEstrategia(tipoVisualizacion);
-     * List<String> reseniasValidas =
-     * tipoReporteStrategy.obtenerVinosConPuntaje(vinos, fechaDesde, fechaHasta);
-     */
-    // Comienza loop en vinos
-    List<Map<Vino, Double>> vinosYPuntaje = new ArrayList<>(vinos.stream().map(vino -> {
-      // TODO: Agregar tieneResenias()
-      double puntaje = vino.mostrarReseniasDeSommelierEnPeriodo(fechaDesde, fechaHasta);
-      if (puntaje == 0) {
-        return null;
-      }
-      return new HashMap<>(Map.of(vino, puntaje));
-    }).filter(Objects::nonNull).toList());
+    this.tomarTipoResenia(tipoResenia);
+    this.tomarTipoVisualizacion(tipoVisualizacion);
+    this.tomarConfirmacion();
 
-    this.ordenarVinosSegunCalificacion(vinosYPuntaje);
-
-    List<List<String>> topTenVinosConInformacion = this.obtenerTopTenVinosConInformacion(vinosYPuntaje);
-
+    List<List<String>> topTenVinosConInformacion = this.generarRankingVinos(vinos, fechaDesde, fechaHasta);
     return ResponseEntity.ok(topTenVinosConInformacion);
+  }
+
+  private List<List<String>> generarRankingVinos(List<Vino> vinos, Date fechaDesde, Date fechaHasta) {
+    List<Map<Vino, Double>> vinosConPromedio = this.strategy.obtenerVinosConPromedio(vinos, fechaDesde, fechaHasta);
+
+    this.ordenarVinosSegunCalificacion(vinosConPromedio);
+
+    List<List<String>> topTenVinosConInformacion = this.obtenerTopTenVinosConInformacion(vinosConPromedio);
+
+    return topTenVinosConInformacion;
+  }
+
+  private void tomarConfirmacion() {
   }
 
   private void ordenarVinosSegunCalificacion(List<Map<Vino, Double>> vinosYPuntaje) {
@@ -68,8 +68,8 @@ public class GestorRankingVinos {
     });
   }
 
-  private List<List<String>> obtenerTopTenVinosConInformacion(List<Map<Vino, Double>> vinosYPuntaje) {
-    return vinosYPuntaje.subList(0, Math.min(10, vinosYPuntaje.size())).stream()
+  private List<List<String>> obtenerTopTenVinosConInformacion(List<Map<Vino, Double>> vinosConPromedio) {
+    return vinosConPromedio.subList(0, Math.min(10, vinosConPromedio.size())).stream()
         .map(mapa -> {
           Vino vino = mapa.keySet().iterator().next();
           double puntaje = mapa.values().iterator().next();
@@ -79,6 +79,15 @@ public class GestorRankingVinos {
         }).toList();
   }
 
+  public void tomarTipoResenia(String tipoResenia) {
+    ITipoReseniaStrategy strategy = this.crearEstrategia(tipoResenia);
+    this.setStrategy(strategy);
+  }
+
+  public void tomarTipoVisualizacion(String tipoVisualizacion) {
+    this.tipoVisualizacion = tipoVisualizacion;
+  }
+
   private ITipoReseniaStrategy crearEstrategia(String tipoVisualizacion) {
     return switch (tipoVisualizacion) {
       case "sommelier" -> new SommelierStrategy();
@@ -86,5 +95,9 @@ public class GestorRankingVinos {
       case "normal" -> new NormalStrategy();
       default -> throw new NotFoundException("Tipo de reseñas no encontrado");
     };
+  }
+
+  public void setStrategy(ITipoReseniaStrategy strategy) {
+    this.strategy = strategy;
   }
 }

@@ -42,7 +42,7 @@ public class Vino {
   public double mostrarReseniasDeSommelierEnPeriodo(Date fechaDesde, Date fechaHasta) {
     List<Resenia> reseniasDeSommelierEnPeriodo = this.resenias.stream()
         .filter(resenia -> resenia.esDePeriodo(fechaDesde, fechaHasta))
-        .filter(Resenia::obtenerEsPremium)
+        .filter(Resenia::sosDeSommelier)
         .toList();
 
     if (reseniasDeSommelierEnPeriodo.isEmpty()) {

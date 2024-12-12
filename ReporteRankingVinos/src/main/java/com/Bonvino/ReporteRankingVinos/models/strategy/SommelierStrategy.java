@@ -10,7 +10,7 @@ import com.Bonvino.ReporteRankingVinos.models.Vino;
 public class SommelierStrategy implements ITipoReseniaStrategy {
   // Calificar Vinos
   // Creamos el List<String> para exportar a excel o pdf
-  public List<Map<Vino, Double>> obtenerVinosConPuntaje(List<Vino> vinos, Date fechaInicio, Date fechaFin) {
+  public List<Map<Vino, Double>> obtenerVinosConPromedio(List<Vino> vinos, Date fechaInicio, Date fechaFin) {
     List<Map<Vino, Double>> vinosYPuntaje = new ArrayList<Map<Vino, Double>>();
     // Mientras haya vinos
     vinos.forEach(
@@ -19,16 +19,22 @@ public class SommelierStrategy implements ITipoReseniaStrategy {
             List<Integer> puntajeResenias = new ArrayList<Integer>();
             vino.getResenias().forEach(
                 resenia -> {
-                  if (resenia.esDePeriodo(fechaFin, fechaFin)) {
-                    // TODO: Cambiar nombre a sosDeSommelier()
-                    if (resenia.obtenerEsPremium()) {
-                      puntajeResenias.add(resenia.getPuntaje());
+                  if (resenia.esDePeriodo(fechaInicio, fechaFin)) {
+                    if (resenia.sosDeSommelier()) {
+                      puntajeResenias.add(resenia.obtenerPuntaje());
                     }
                   }
                 });
-            vinosYPuntaje.add(Map.of(vino, puntajeResenias.stream().mapToInt(Integer::intValue).average().orElse(0)));
+
+            double promedio = this.calcularPromedioReseniasValidadas(puntajeResenias);
+
+            vinosYPuntaje.add(Map.of(vino, promedio));
           }
         });
     return vinosYPuntaje;
+  }
+
+  public double calcularPromedioReseniasValidadas(List<Integer> puntajeResenias) {
+    return puntajeResenias.stream().mapToInt(Integer::intValue).average().orElse(0.0);
   }
 }
