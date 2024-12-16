@@ -81,7 +81,7 @@ public class GestorRankingVinos {
           Vino vino = mapa.keySet().iterator().next();
           double puntaje = mapa.values().iterator().next();
           return List.of(
-              String.valueOf(puntaje),
+              String.format("%.2f", puntaje),
               vino.obtenerInformacionVinoBodegaYVarietal());
         }).toList();
   }

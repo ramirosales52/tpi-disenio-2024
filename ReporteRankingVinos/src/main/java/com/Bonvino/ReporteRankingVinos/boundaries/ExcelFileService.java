@@ -21,9 +21,27 @@ public class ExcelFileService {
     Workbook workbook = new XSSFWorkbook();
     Sheet sheet = workbook.createSheet("Vinos");
 
+    // Crear estilo de celda para los títulos
+    CellStyle headerStyle = workbook.createCellStyle();
+    Font boldFont = workbook.createFont();
+    boldFont.setBold(true);
+    headerStyle.setFont(boldFont);
+
+    // Crear la fila de encabezado
+    Row headerRow = sheet.createRow(0);
+
+    // Crear y estilizar las celdas de los títulos
+    Cell headerCell1 = headerRow.createCell(0);
+    headerCell1.setCellValue("Puntaje");
+    headerCell1.setCellStyle(headerStyle);
+
+    Cell headerCell2 = headerRow.createCell(1);
+    headerCell2.setCellValue("Datos del vino");
+    headerCell2.setCellStyle(headerStyle);
+
     // Llenar las filas con los datos
     for (int i = 0; i < data.size(); i++) {
-      Row row = sheet.createRow(i);
+      Row row = sheet.createRow(i + 1); // Empieza desde la fila 1
       List<String> rowData = data.get(i);
 
       for (int j = 0; j < rowData.size(); j++) {
