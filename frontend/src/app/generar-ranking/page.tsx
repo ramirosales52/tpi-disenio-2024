@@ -177,7 +177,7 @@ export default function GenerarRankingVinos() {
                     <Button
                       className="w-36"
                       type="default"
-                      href={`http://localhost:4000/static/vinos.${tipoVisualizacion}`}
+                      href={`http://localhost:4000/vinos.${tipoVisualizacion}`}
                       target="_blank"
                       disabled={visible}>
                       Descargar reporte

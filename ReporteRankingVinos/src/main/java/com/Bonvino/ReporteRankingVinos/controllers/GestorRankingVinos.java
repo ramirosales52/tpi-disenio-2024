@@ -1,5 +1,6 @@
 package com.Bonvino.ReporteRankingVinos.controllers;
 
+import java.io.IOException;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.Bonvino.ReporteRankingVinos.boundaries.ExcelFileService;
 import com.Bonvino.ReporteRankingVinos.exceptions.NotFoundException;
 import com.Bonvino.ReporteRankingVinos.models.Vino;
 import com.Bonvino.ReporteRankingVinos.models.strategy.AmigosStrategy;
@@ -28,11 +30,11 @@ public class GestorRankingVinos {
 
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/generar-ranking")
-  public ResponseEntity<Object> get(
+  public ResponseEntity<?> get(
       @RequestParam @DateTimeFormat(pattern = "yyyy-mm-dd") Date fechaDesde,
       @RequestParam @DateTimeFormat(pattern = "yyyy-mm-dd") Date fechaHasta,
       @RequestParam String tipoVisualizacion,
-      @RequestParam String tipoResenia) {
+      @RequestParam String tipoResenia) throws IOException {
     // Llamado a la base de datos para obtener los vinos
     List<Vino> vinos = vinoService.getAllVinos();
     if (vinos.isEmpty()) {
@@ -44,6 +46,11 @@ public class GestorRankingVinos {
     this.tomarConfirmacion();
 
     List<List<String>> topTenVinosConInformacion = this.generarRankingVinos(vinos, fechaDesde, fechaHasta);
+
+    ExcelFileService excelExport = new ExcelFileService();
+
+    excelExport.createExcelFile(topTenVinosConInformacion, "vinos.xlsx");
+
     return ResponseEntity.ok(topTenVinosConInformacion);
   }
 
