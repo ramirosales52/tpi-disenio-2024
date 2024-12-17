@@ -18,8 +18,6 @@ import com.Bonvino.ReporteRankingVinos.models.strategy.ITipoReseniaStrategy;
 import com.Bonvino.ReporteRankingVinos.services.IVinoService;
 
 @RestController
-// @RequestMapping("/ranking-vinos")
-
 public class GestorRankingVinos {
   private ITipoReseniaStrategy strategy;
   @SuppressWarnings("unused")
@@ -48,13 +46,12 @@ public class GestorRankingVinos {
     List<List<String>> topTenVinosConInformacion = this.generarRankingVinos(vinos, fechaDesde, fechaHasta);
 
     ExcelFileService excelExport = new ExcelFileService();
-
-    excelExport.createExcelFile(topTenVinosConInformacion, "vinos.xlsx");
+    excelExport.generarExcel(topTenVinosConInformacion, "vinos.xlsx");
 
     return ResponseEntity.ok(topTenVinosConInformacion);
   }
 
-  private List<List<String>> generarRankingVinos(List<Vino> vinos, Date fechaDesde, Date fechaHasta) {
+  public List<List<String>> generarRankingVinos(List<Vino> vinos, Date fechaDesde, Date fechaHasta) {
     List<Map<Vino, Double>> vinosConPromedio = this.strategy.obtenerVinosConPromedio(vinos, fechaDesde, fechaHasta);
 
     this.ordenarVinosSegunCalificacion(vinosConPromedio);
@@ -64,10 +61,10 @@ public class GestorRankingVinos {
     return topTenVinosConInformacion;
   }
 
-  private void tomarConfirmacion() {
+  public void tomarConfirmacion() {
   }
 
-  private void ordenarVinosSegunCalificacion(List<Map<Vino, Double>> vinosYPuntaje) {
+  public void ordenarVinosSegunCalificacion(List<Map<Vino, Double>> vinosYPuntaje) {
     vinosYPuntaje.sort((mapaA, mapaB) -> {
       double maxA = mapaA.values().stream().max(Double::compare).orElse(0.0);
       double maxB = mapaB.values().stream().max(Double::compare).orElse(0.0);
@@ -75,7 +72,7 @@ public class GestorRankingVinos {
     });
   }
 
-  private List<List<String>> obtenerTopTenVinosConInformacion(List<Map<Vino, Double>> vinosConPromedio) {
+  public List<List<String>> obtenerTopTenVinosConInformacion(List<Map<Vino, Double>> vinosConPromedio) {
     return vinosConPromedio.subList(0, Math.min(10, vinosConPromedio.size())).stream()
         .map(mapa -> {
           Vino vino = mapa.keySet().iterator().next();
@@ -95,7 +92,7 @@ public class GestorRankingVinos {
     this.tipoVisualizacion = tipoVisualizacion;
   }
 
-  private ITipoReseniaStrategy crearEstrategia(String tipoVisualizacion) {
+  public ITipoReseniaStrategy crearEstrategia(String tipoVisualizacion) {
     return switch (tipoVisualizacion) {
       case "sommelier" -> new SommelierStrategy();
       case "amigo" -> new AmigosStrategy();

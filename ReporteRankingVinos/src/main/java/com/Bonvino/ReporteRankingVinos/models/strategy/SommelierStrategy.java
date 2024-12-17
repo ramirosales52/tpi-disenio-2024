@@ -19,10 +19,8 @@ public class SommelierStrategy implements ITipoReseniaStrategy {
             List<Integer> puntajeResenias = new ArrayList<Integer>();
             vino.getResenias().forEach(
                 resenia -> {
-                  if (resenia.esDePeriodo(fechaInicio, fechaFin)) {
-                    if (resenia.sosDeSommelier()) {
-                      puntajeResenias.add(resenia.obtenerPuntaje());
-                    }
+                  if (resenia.esDePeriodo(fechaInicio, fechaFin) && resenia.sosDeSommelier()) {
+                    puntajeResenias.add(resenia.obtenerPuntaje());
                   }
                 });
 

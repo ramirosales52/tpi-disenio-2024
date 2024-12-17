@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class ExcelFileService {
 
-  public void createExcelFile(List<List<String>> data, String filename) throws IOException {
+  public void generarExcel(List<List<String>> data, String filename) throws IOException {
     Files.createDirectories(Paths.get("./static"));
     String staticDirectoryPath = Paths.get("./static").toAbsolutePath().toString();
     String filePath = staticDirectoryPath + "/" + filename;
