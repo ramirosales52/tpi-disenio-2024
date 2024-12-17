@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.Bonvino.ReporteRankingVinos.boundaries.ExcelFileService;
+import com.Bonvino.ReporteRankingVinos.boundaries.InterfazExcel;
 import com.Bonvino.ReporteRankingVinos.exceptions.NotFoundException;
 import com.Bonvino.ReporteRankingVinos.models.Vino;
 import com.Bonvino.ReporteRankingVinos.models.strategy.AmigosStrategy;
@@ -23,8 +23,12 @@ public class GestorRankingVinos {
   @SuppressWarnings("unused")
   private String tipoVisualizacion;
 
+  private List<List<String>> topTenVinosConInformacion;
+
   @Autowired
   private IVinoService vinoService;
+
+  private List<Vino> vinos;
 
   @CrossOrigin(origins = "http://localhost:3000")
   @GetMapping("/generar-ranking")
@@ -34,7 +38,7 @@ public class GestorRankingVinos {
       @RequestParam String tipoVisualizacion,
       @RequestParam String tipoResenia) throws IOException {
     // Llamado a la base de datos para obtener los vinos
-    List<Vino> vinos = vinoService.getAllVinos();
+    this.vinos = vinoService.getAllVinos();
     if (vinos.isEmpty()) {
       throw new NotFoundException("No hay vinos en la base de datos");
     }
@@ -43,10 +47,13 @@ public class GestorRankingVinos {
     this.tomarTipoVisualizacion(tipoVisualizacion);
     this.tomarConfirmacion();
 
-    List<List<String>> topTenVinosConInformacion = this.generarRankingVinos(vinos, fechaDesde, fechaHasta);
+    this.topTenVinosConInformacion = this.generarRankingVinos(vinos, fechaDesde, fechaHasta);
 
-    ExcelFileService excelExport = new ExcelFileService();
-    excelExport.generarExcel(topTenVinosConInformacion, "vinos.xlsx");
+    if (tipoVisualizacion.equals("xlsx")) {
+      InterfazExcel excelExport = new InterfazExcel();
+      excelExport.generarExcel(topTenVinosConInformacion, "vinos.xlsx");
+    }
+    // Resto de tipos de visualización
 
     return ResponseEntity.ok(topTenVinosConInformacion);
   }

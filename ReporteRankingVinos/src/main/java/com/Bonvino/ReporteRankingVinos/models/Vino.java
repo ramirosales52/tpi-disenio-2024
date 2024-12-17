@@ -1,6 +1,5 @@
 package com.Bonvino.ReporteRankingVinos.models;
 
-import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -35,30 +34,18 @@ public class Vino {
     this.precio = precio;
   }
 
+  public double getCalificacionGeneral() {
+    return this.resenias.stream().mapToInt(Resenia::obtenerPuntaje).average().orElse(0.0);
+  }
+
   public boolean tieneResenias() {
     return !this.resenias.isEmpty();
   }
 
-  public double mostrarReseniasDeSommelierEnPeriodo(Date fechaDesde, Date fechaHasta) {
-    List<Resenia> reseniasDeSommelierEnPeriodo = this.resenias.stream()
-        .filter(resenia -> resenia.esDePeriodo(fechaDesde, fechaHasta))
-        .filter(Resenia::sosDeSommelier)
-        .toList();
-
-    if (reseniasDeSommelierEnPeriodo.isEmpty()) {
-      return 0;
-    }
-
-    return calcularPromedioReseniasValidadas(reseniasDeSommelierEnPeriodo);
-  }
-
   public String obtenerInformacionVinoBodegaYVarietal() {
     return this.getNombre() + " - " + String.valueOf(this.getPrecio()) + " - "
+        + String.format("%.2f", this.getCalificacionGeneral()) + " - "
         + this.bodega.obtenerNombreRegionProvinciaYPais() + " - "
         + this.varietales.stream().map(Varietal::getNombre).toList();
-  }
-
-  private double calcularPromedioReseniasValidadas(List<Resenia> resenias) {
-    return (double) resenias.stream().mapToDouble(Resenia::obtenerPuntaje).average().orElse(0);
   }
 }

@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Service
-public class ExcelFileService {
+public class InterfazExcel {
 
   public void generarExcel(List<List<String>> data, String filename) throws IOException {
     Files.createDirectories(Paths.get("./static"));

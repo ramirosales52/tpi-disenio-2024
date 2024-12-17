@@ -23,6 +23,7 @@ public class Resenia {
   private Integer puntaje;
   private Date fechaResenia;
 
+  // Atributo necesario para la relación con la tabla Vino
   @ManyToOne
   @JoinColumn(name = "vino_id", nullable = false)
   private Vino vino;
